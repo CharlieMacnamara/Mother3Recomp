@@ -44,6 +44,7 @@ set(MOTHER3_SOURCES
     src/main.cpp
     src/mother3_runtime_hooks.cpp
     src/m3_assets.cpp
+    src/m3_intro.cpp
     src/m3_launcher.cpp
     src/m3_settings.cpp
     src/m3_setup.cpp
@@ -216,6 +217,11 @@ if(WIN32)
 endif()
 
 include(CTest)
+if(BUILD_TESTING AND NOT ANDROID)
+    add_executable(m3_intro_test tests/m3_intro_test.cpp)
+    target_include_directories(m3_intro_test PRIVATE src)
+    add_test(NAME m3_intro_test COMMAND m3_intro_test)
+endif()
 if(BUILD_TESTING AND GBAGAME_RECOMP_UI AND NOT ANDROID)
     add_executable(host_menu_test tests/host_menu_test.cpp
         "${GBARECOMP_ROOT}/tools/bios_smoke/dispatch_stub.cpp")

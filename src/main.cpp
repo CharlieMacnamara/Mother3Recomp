@@ -13,6 +13,7 @@
 #include "view_config.h"
 #include "mother3_runtime_hooks.h"
 #include "m3_assets.h"
+#include "m3_intro.h"
 #include "m3_launcher.h"
 #include "m3_settings.h"
 #include "m3_setup.h"
@@ -51,6 +52,22 @@ void (*g_next_vblank)() = nullptr;
 void mother3_vblank() {
     m3widescreen::tick();  // throttles itself; nothing to do at 240 px
     if (g_next_vblank) g_next_vblank();
+}
+
+// RunOptions::savestate_loaded already belongs to RetroAchievements on
+// Android, so the intro skip chains rather than replacing it.
+void (*g_next_savestate_loaded)(const char*) = nullptr;
+void mother3_savestate_loaded(const char* path) {
+    m3intro::savestate_loaded(path);
+    if (g_next_savestate_loaded) g_next_savestate_loaded(path);
+}
+
+void install_intro_skip(gbarecomp::RunOptions& opts, bool enabled) {
+    if (!enabled) return;
+    m3intro::enable(true);
+    opts.input_frame = &m3intro::input_frame;
+    g_next_savestate_loaded = opts.savestate_loaded;
+    opts.savestate_loaded = &mother3_savestate_loaded;
 }
 
 // A 320px view also grows 10 rows above and below the native 160: 320x180 is
@@ -259,7 +276,8 @@ int mother3_main(int argc, char** argv) {
     args.erase(std::remove(args.begin(), args.end(), std::string("--no-launcher")), args.end());
     // Handhelds get the full-screen 320x180 view (see mother3_view_geometry).
     opts.max_view_width = 320;
-    if (m3settings::load(".").widescreen) args.insert(args.begin() + 1, {"--view-width", "320"});
+    const m3settings::Settings android_settings = m3settings::load(".");
+    if (android_settings.widescreen) args.insert(args.begin() + 1, {"--view-width", "320"});
     opts.orientation = gbarecomp::RunOptions::Orientation::Landscape;
     opts.resume_suspend_state_on_launch = true;
     opts.ui_touch_friendly = true;
@@ -276,18 +294,24 @@ int mother3_main(int argc, char** argv) {
     // No-op unless the setup screen stored RetroAchievements credentials.
     mother3::ra_install(opts, MOTHER3_ROM_FILE);
 #endif
+    install_intro_skip(opts, android_settings.skip_intro);
 #else
     if (!m3_launcher_preboot(args)) return 0;
+    bool skip_intro = false;
     {
         std::string dir = args[0];
         const auto slash = dir.find_last_of("/\\");
         dir = slash == std::string::npos ? "." : dir.substr(0, slash);
+        const m3settings::Settings settings = m3settings::load(dir);
         const char* force = std::getenv("M3_SMOOTH");
-        m3smooth::enable(force ? std::atoi(force) : m3settings::load(dir).smooth);
+        m3smooth::enable(force ? std::atoi(force) : settings.smooth);
+        const char* force_intro = std::getenv("M3_SKIP_INTRO");
+        skip_intro = force_intro ? std::atoi(force_intro) != 0 : settings.skip_intro;
     }
 #if defined(GBAGAME_RECOMP_UI)
     if (game_launcher_preboot(args, opts)) return 0;
 #endif
+    install_intro_skip(opts, skip_intro);
 #endif
     g_next_vblank = opts.vblank_frame;
     opts.vblank_frame = &mother3_vblank;

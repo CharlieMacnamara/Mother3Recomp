@@ -38,8 +38,8 @@ MOTHER 3's own launcher opens: the party walks around outside Tazmily while you 
 **Controls** or **Mods**. Everything it shows is drawn from your ROM; no game art ships with the download.
 
 - **Settings:** window flavor (the game's Plain to Melon), display mode, window size, scaling, screen colors,
-  volume, **Button prompts**, **Frame rate**, **Import a save file**, and **Change game files** to pick a different
-  ROM or BIOS.
+  volume, **Button prompts**, **Frame rate**, **Skip intro**, **Import a save file**, and **Change game files** to
+  pick a different ROM or BIOS.
 - **Import a save file:** bring over a save from another emulator (mGBA, VBA, RetroArch, My Boy!, etc.). Pick its
   battery save (`.sav` or `.srm`, not a save state). Your current save is kept as `saves/mother3_en_v13.sav.bak`.
   On Android, use **Import a save from another emulator** on the setup screen.
@@ -48,6 +48,9 @@ MOTHER 3's own launcher opens: the party walks around outside Tazmily while you 
   in smaller steps. The launcher shows your screen's rate, such as **144 (smooth)**. The game itself still runs at
   its normal speed. On a 60 Hz screen it has no effect, and the launcher says so. If your screen is fast but the
   game still shows 60 fps, choose **Smooth (always)**, which skips the screen check.
+- **Skip intro:** on by default. The game presses through the health-and-safety page, the translation card and
+  the other startup screens, then stops at the title menu. Turn it off to read them. It never presses a button
+  once the title is up, and a loaded save state turns it off for that session.
 - **Japanese (untranslated):** pick the Japanese ROM and answer **Yes** to play it in Japanese. The launcher opens as
   usual, with its own font, since the Japanese ROM has no English letters.
 - **Other translations** (Spanish, Italian, Brazilian Portuguese and others) open the launcher too; when a ROM's font

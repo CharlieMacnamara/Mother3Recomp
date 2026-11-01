@@ -19,6 +19,7 @@ Bring your own ROM and game files.
 - On-screen buttons in the game's text match your controller (Xbox, PlayStation or Nintendo) or keyboard
 - Controls page for keyboard and controller; the left stick always moves
 - Mods: drop `.ips`, `.bps` or `.ups` patches in the `mods` folder and tick them in the launcher
+- Skip the startup screens and boot straight to the title menu (on by default; Settings > Skip intro)
 - 16:9 widescreen in the field (drawn from the real map), in battles and in cutscenes
 - Window flavors, display, scaling and screen-color options; a Windows bezel built from your ROM
 - Built-in high-quality audio mixing
