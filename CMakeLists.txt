@@ -32,6 +32,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/generated/recompiled.cpp")
         "Run tools/regen.ps1 with the current gbarecomp worktree.")
 endif()
 set(MOTHER3_GENERATED_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/generated" CACHE PATH "Private regenerated cart sources")
+option(MOTHER3_ALLOW_INTERPRETED_BIOS "Build when the BIOS runs on the interpreter bridge" OFF)
 file(GLOB GAME_GENERATED_SOURCES CONFIGURE_DEPENDS
     "${MOTHER3_GENERATED_ROOT}/*.c"
     "${MOTHER3_GENERATED_ROOT}/*.cpp")
@@ -65,7 +66,8 @@ endif()
 # A native game corpus without the recompiled BIOS runs the IRQ/SWI handlers on
 # the interpreter bridge, which breaks audio pacing on every platform. Fail the
 # game target only, so gba_recompile can still be built to generate the BIOS.
-if(EXISTS "${MOTHER3_GENERATED_ROOT}/dispatch_table.cpp" AND
+if(NOT MOTHER3_ALLOW_INTERPRETED_BIOS AND
+   EXISTS "${MOTHER3_GENERATED_ROOT}/dispatch_table.cpp" AND
    NOT EXISTS "${GBARECOMP_ROOT}/src/runtime/generated_bios/bios_recompiled.cpp")
     add_custom_target(mother3_require_native_bios
         COMMAND "${CMAKE_COMMAND}" -E echo
